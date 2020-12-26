@@ -39,8 +39,13 @@ public class AnimationSetWriter
     {
 
     }
+    
+    public void createAnimationSet(File aSaveFile, String aSpritesheetName, ArrayList<Animation> aAnimList) {
+    	createAnimationSetImpl(aSaveFile, aSpritesheetName, aAnimList, false);
+    	createAnimationSetImpl(new File(aSaveFile.getAbsolutePath().replace(".anim", "") + "-weapon.anim"), aSpritesheetName, aAnimList, true);
+    }
 
-    public void createAnimationSet(File aSaveFile, String aSpritesheetName, ArrayList<Animation> aAnimList)
+    public void createAnimationSetImpl(File aSaveFile, String aSpritesheetName, ArrayList<Animation> aAnimList, boolean exportWeapon)
     {
         try
         {
@@ -58,23 +63,20 @@ public class AnimationSetWriter
 
             for (int i=0; i<aAnimList.size(); ++i)
             {
-                writeAnimToXml(xmlwriter, aAnimList.get(i));
+                writeAnimToXml(xmlwriter, aAnimList.get(i), exportWeapon);
             }
 
             xmlwriter.endEntity();
-
             xmlwriter.close();
-            System.err.println(out.toString());
             out.close();
         }
         catch (IOException e)
         {
-
-
+        	e.printStackTrace();
         }
     }
 
-    private void writeAnimToXml(XmlWriter aXmlWriter, Animation aAnimation) throws IOException
+    private void writeAnimToXml(XmlWriter aXmlWriter, Animation aAnimation, boolean exportWeapon) throws IOException
     {
          aXmlWriter.writeEntity("anim");
          aXmlWriter.writeAttribute("name", aAnimation.getName());
@@ -90,24 +92,26 @@ public class AnimationSetWriter
             aXmlWriter.writeAttribute("delay", cell.getDelay());
 
             ArrayList<GraphicObject> graphicList = cell.getGraphicList();
-            for (int i=0; i<graphicList.size(); ++i)
-            {
+            for (int i=0; i<graphicList.size(); ++i) {
                 SpriteGraphic graphic = (SpriteGraphic)graphicList.get(i);
                 CustomNode node = cell.nodeForGraphic(graphic);
-                aXmlWriter.writeEntity("spr");
-                aXmlWriter.writeAttribute("name", node.getFullPathName());
-                aXmlWriter.writeAttribute("x", graphic.getRect().x + graphic.getRect().width/2);
-                aXmlWriter.writeAttribute("y", graphic.getRect().y + graphic.getRect().height/2);                                
-                aXmlWriter.writeAttribute("z", cell.zOrderOfGraphic(graphic));                                
-                
-                if (graphic.getAngle() != 0)
-                    aXmlWriter.writeAttribute("angle", graphic.getAngle());
-                if (graphic.isFlippedV())
-                    aXmlWriter.writeAttribute("flipV", graphic.isFlippedV() ? 1 : 0);
-                if (graphic.isFlippedH())
-                    aXmlWriter.writeAttribute("flipH", graphic.isFlippedH() ? 1 : 0);
-                
-                aXmlWriter.endEntity();
+                if (exportWeapon == node.getFullPathName().equalsIgnoreCase("/Weapon") || exportWeapon == node.getFullPathName().equalsIgnoreCase("/Swoosh"))
+                {
+	                aXmlWriter.writeEntity("spr");
+	                aXmlWriter.writeAttribute("name", node.getFullPathName());
+	                aXmlWriter.writeAttribute("x", graphic.getRect().x + graphic.getRect().width/2);
+	                aXmlWriter.writeAttribute("y", graphic.getRect().y + graphic.getRect().height/2);                                
+	                aXmlWriter.writeAttribute("z", cell.zOrderOfGraphic(graphic));                                
+	                
+	                if (graphic.getAngle() != 0)
+	                    aXmlWriter.writeAttribute("angle", graphic.getAngle());
+	                if (graphic.isFlippedV())
+	                    aXmlWriter.writeAttribute("flipV", graphic.isFlippedV() ? 1 : 0);
+	                if (graphic.isFlippedH())
+	                    aXmlWriter.writeAttribute("flipH", graphic.isFlippedH() ? 1 : 0);
+	                
+	                aXmlWriter.endEntity();
+                }
             }
 
             aXmlWriter.endEntity();
