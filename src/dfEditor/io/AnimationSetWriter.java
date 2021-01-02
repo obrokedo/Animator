@@ -42,7 +42,14 @@ public class AnimationSetWriter
     
     public void createAnimationSet(File aSaveFile, String aSpritesheetName, ArrayList<Animation> aAnimList) {
     	createAnimationSetImpl(aSaveFile, aSpritesheetName, aAnimList, false);
-    	createAnimationSetImpl(new File(aSaveFile.getAbsolutePath().replace(".anim", "") + "-weapon.anim"), aSpritesheetName, aAnimList, true);
+    	// Don't write the animation file for weapons if there are no weapons in the animation
+    	for (Animation anim : aAnimList)
+    	{
+    		if (hasWeaponOrSwoosh(anim)) {
+    			createAnimationSetImpl(new File(aSaveFile.getAbsolutePath().replace(".anim", "") + "-weapon.anim"), aSpritesheetName, aAnimList, true);
+    			break;
+    		}
+    	}
     }
 
     public void createAnimationSetImpl(File aSaveFile, String aSpritesheetName, ArrayList<Animation> aAnimList, boolean exportWeapon)
@@ -75,6 +82,23 @@ public class AnimationSetWriter
         	e.printStackTrace();
         }
     }
+    
+    private boolean hasWeaponOrSwoosh(Animation aAnimation) {
+    	AnimationCell cell = aAnimation.getCurrentCell();
+        while(cell !=  null)
+        {
+           ArrayList<GraphicObject> graphicList = cell.getGraphicList();
+           for (int i=0; i<graphicList.size(); ++i) {
+               SpriteGraphic graphic = (SpriteGraphic)graphicList.get(i);
+               CustomNode node = cell.nodeForGraphic(graphic);
+               if (node.getFullPathName().equalsIgnoreCase("/Weapon") || node.getFullPathName().equalsIgnoreCase("/Swoosh"))
+            	   return true;
+           }
+
+           cell = aAnimation.getNextCell();
+        }
+        return false;
+    }
 
     private void writeAnimToXml(XmlWriter aXmlWriter, Animation aAnimation, boolean exportWeapon) throws IOException
     {
@@ -95,7 +119,7 @@ public class AnimationSetWriter
             for (int i=0; i<graphicList.size(); ++i) {
                 SpriteGraphic graphic = (SpriteGraphic)graphicList.get(i);
                 CustomNode node = cell.nodeForGraphic(graphic);
-                if (exportWeapon == node.getFullPathName().equalsIgnoreCase("/Weapon") || exportWeapon == node.getFullPathName().equalsIgnoreCase("/Swoosh"))
+                if (exportWeapon == (node.getFullPathName().equalsIgnoreCase("/Weapon") || node.getFullPathName().equalsIgnoreCase("/Swoosh")))
                 {
 	                aXmlWriter.writeEntity("spr");
 	                aXmlWriter.writeAttribute("name", node.getFullPathName());
