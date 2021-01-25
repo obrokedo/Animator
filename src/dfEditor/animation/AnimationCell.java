@@ -337,4 +337,19 @@ public class AnimationCell
 
     }
 
+    public void combineAnimationCell(AnimationCell combine) {
+    	Enumeration<GraphicObject> nodeDictEnum = combine.graphicNodeDict.keys();    	
+    	while (nodeDictEnum.hasMoreElements()) {
+    		GraphicObject go = nodeDictEnum.nextElement();
+    		this.graphicNodeDict.put(go, combine.graphicNodeDict.get(go));
+    	}
+    	
+    	Enumeration<GraphicObject> orderEnum = combine.graphicZOrderDict.keys();    	
+    	while (orderEnum.hasMoreElements()) {
+    		GraphicObject go = orderEnum.nextElement();
+    		this.graphicZOrderDict.put(go, combine.graphicZOrderDict.get(go));
+    	}
+    	
+    	this.graphicOrderList.addAll(combine.graphicOrderList);
+    }
 }

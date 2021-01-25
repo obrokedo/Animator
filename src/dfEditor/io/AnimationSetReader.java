@@ -57,7 +57,6 @@ public class AnimationSetReader
     {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         doc = builder.parse(aFile);
-
         file = aFile;
     }
 

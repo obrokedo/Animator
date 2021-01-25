@@ -82,7 +82,7 @@ public class AnimationSetWriter
         	e.printStackTrace();
         }
     }
-    
+
     private boolean hasWeaponOrSwoosh(Animation aAnimation) {
     	AnimationCell cell = aAnimation.getCurrentCell();
         while(cell !=  null)
@@ -99,7 +99,7 @@ public class AnimationSetWriter
         }
         return false;
     }
-
+    
     private void writeAnimToXml(XmlWriter aXmlWriter, Animation aAnimation, boolean exportWeapon) throws IOException
     {
          aXmlWriter.writeEntity("anim");

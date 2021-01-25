@@ -503,8 +503,8 @@ public class dfEditorView extends FrameView implements TaskChangeListener, org.j
                 {
                     AnimationController animController = new AnimationController(new CommandManager(undoMenuItem, redoMenuItem), false, helpLabel, this, fileChooser);
                     try {
-                        AnimationSetReader reader = new AnimationSetReader(selectedFile);
-                        bLoaded = animController.load(reader);
+                        
+                        bLoaded = animController.load(selectedFile);
                         task = animController;
                         if (helpLabel != null)
                             helpLabel.setText("Loaded animations " + selectedFile.toString());

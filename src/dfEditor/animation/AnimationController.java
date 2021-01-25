@@ -55,6 +55,9 @@ import javax.swing.event.InternalFrameListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 import dfEditor.CustomNode;
 import dfEditor.GraphicObject;
@@ -2083,8 +2086,9 @@ private void exportGifButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
 
 
 
-    public boolean load(AnimationSetReader aReader)
+    public boolean load(File aFile) throws ParserConfigurationException, SAXException, IOException
     {
+    	AnimationSetReader aReader = new AnimationSetReader(aFile);
         String spriteSheetPath = aReader.getSpriteSheetPath();
 
         File ssFile = new File(spriteSheetPath);
@@ -2104,6 +2108,19 @@ private void exportGifButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
         try
         {
             animations = aReader.getAnimations(spriteTree, bufferedImage);
+            File weaponFile = new File(aFile.getAbsolutePath().replace(".anim", "") + "-weapon.anim");
+            if (weaponFile.exists()) {
+            	AnimationSetReader weaponReader = new AnimationSetReader(weaponFile);
+            	ArrayList<Animation> weaponAnims = weaponReader.getAnimations(spriteTree, bufferedImage);
+            	System.out.println();
+            	for (int i = 0; i < animations.size(); i++) {
+            		Animation anim = animations.get(i);
+            		for (int j = 0; j < anim.numCells(); j++) {
+            			AnimationCell cell = anim.getCellAtIndex(j);
+            			cell.combineAnimationCell(weaponAnims.get(i).getCellAtIndex(j));
+            		}
+            	}
+            }
         }
         catch (Exception e)
         {
